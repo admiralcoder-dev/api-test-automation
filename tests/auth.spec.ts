@@ -26,7 +26,8 @@ test('invalid quantity is rejected with 422 @negative', async ({ request }) => {
 test('malformed JSON returns 400 @negative', async ({ request }) => {
   const response = await request.post('/v1/items', {
     headers: { authorization: 'Bearer local-test-token', 'content-type': 'application/json' },
-    data: '{broken-json',
+    // Buffer sends malformed bytes verbatim; a string would be JSON-encoded by Playwright.
+    data: Buffer.from('{broken-json'),
   });
   expect(response.status()).toBe(400);
   expect(ErrorResponseSchema.parse(await response.json()).error.code).toBe('INVALID_JSON');
